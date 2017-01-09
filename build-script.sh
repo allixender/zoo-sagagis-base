@@ -62,25 +62,28 @@ cd $BUILD_ROOT && tar -xzf saga_2.1.4.tar.gz \
   && make -j2 \
   && make install || exit 1
 
-  # install SAGA GIS config
-  cd $BUILD_ROOT/thirds/saga2zcfg \
-    && make \
-    && mkdir zcfgs \
-    && cd zcfgs \
-    && ../saga2zcfg \
-    && mkdir -p $CGI_DIR/SAGA \
-    && cp -r * $CGI_DIR/SAGA || exit 1
+echo /usr/lib/saga >> /etc/ld.so.conf.d/saga.conf && /sbin/ldconfig || exit 1
 
-  # however, auto additonal packages won't get removed
-  # maybe auto remove is a bit too hard
-  # RUN apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
-  # ENV AUTO_ADDED_PACKAGES $(apt-mark showauto)
-  # RUN apt-get remove --purge -y $BUILD_PACKAGES $AUTO_ADDED_PACKAGES
+# install SAGA GIS config - needs to happen after zoo kernel build
+# goes into zoo-sagagis-docker
+# cd $BUILD_ROOT/thirds/saga2zcfg \
+#   && make \
+#   && mkdir zcfgs \
+#   && cd zcfgs \
+#   && ../saga2zcfg \
+#   && mkdir -p $CGI_DIR/SAGA \
+#   && cp -r * $CGI_DIR/SAGA || exit 1
 
-  apt-get remove --purge -y $BUILD_PACKAGES \
-    && rm -rf /var/lib/apt/lists/*
+# however, auto additonal packages won't get removed
+# maybe auto remove is a bit too hard
+# RUN apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+# ENV AUTO_ADDED_PACKAGES $(apt-mark showauto)
+# RUN apt-get remove --purge -y $BUILD_PACKAGES $AUTO_ADDED_PACKAGES
 
-  # do we need to consider /usr/lib/saga ?
-  # 611M    /opt/build/saga-2.1.4 ouch
-  rm -rf $BUILD_ROOT/saga-2.1.4
-  rm -rf $BUILD_ROOT/saga_2.1.4.tar.gz
+apt-get remove --purge -y $BUILD_PACKAGES \
+  && rm -rf /var/lib/apt/lists/*
+
+# do we need to consider /usr/lib/saga ?
+# 611M    /opt/build/saga-2.1.4 ouch
+rm -rf $BUILD_ROOT/saga-2.1.4
+rm -rf $BUILD_ROOT/saga_2.1.4.tar.gz
